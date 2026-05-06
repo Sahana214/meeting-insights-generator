@@ -6,7 +6,8 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 import whisper
 from datetime import datetime
-
+from dotenv import load_dotenv
+load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 import json
@@ -19,8 +20,6 @@ def from_json(value):
         return []
 
 whisper_model = whisper.load_model("tiny")
-from dotenv import load_dotenv
-load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 login_manager = LoginManager()
