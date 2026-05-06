@@ -19,7 +19,14 @@ def from_json(value):
     except:
         return []
 
-whisper_model = whisper.load_model("tiny")
+whisper_model = None
+
+def get_model():
+    global whisper_model
+    if whisper_model is None:
+        import whisper
+        whisper_model = whisper.load_model("tiny")
+    return whisper_model
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 login_manager = LoginManager()
@@ -131,7 +138,8 @@ def home():
                 file.save(filepath)
 
                 try:
-                    transcript = whisper_model.transcribe(filepath)
+                    model = get_model()
+                    transcript = model.transcribe(filepath)
                     text = transcript["text"].strip()
                 except Exception as e:
                     result = {"summary":"Audio Error","key_points":[],"action_items":[str(e)]}
