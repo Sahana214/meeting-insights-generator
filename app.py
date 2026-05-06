@@ -35,11 +35,19 @@ login_manager.login_view = "login"
 
 class User(UserMixin):
     def __init__(self, id):
-        self.id = id
+        self.id = str(id)
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User(user_id)
+    conn = sqlite3.connect("meetings.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE id=?", (user_id,))
+    user = cursor.fetchone()
+    conn.close()
+
+    if user:
+        return User(user_id)
+    return None
 
 def init_db():
     conn = sqlite3.connect("meetings.db")
@@ -104,7 +112,7 @@ def login():
         conn.close()
 
         if user:
-            login_user(User(u))
+            login_user(User(user[0]))
             return redirect("/")
 
         return "Invalid credentials"
