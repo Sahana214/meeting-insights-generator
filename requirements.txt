@@ -1,0 +1,7 @@
+Flask
+flask-login
+groq
+openai-whisper
+reportlab
+python-dotenv
+gunicorn

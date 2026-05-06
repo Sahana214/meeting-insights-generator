@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Meeting History</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:#f4f7fb;
+padding:30px;
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+.topnav{
+text-align:right;
+max-width:1100px;
+margin:0 auto 20px auto;
+}
+
+.topnav a{
+margin-left:15px;
+text-decoration:none;
+color:#2563eb;
+font-weight:bold;
+}
+
+.search-box{
+max-width:1100px;
+margin:0 auto 20px auto;
+display:flex;
+gap:10px;
+}
+
+.search-box input{
+flex:1;
+padding:10px;
+border:1px solid #ccc;
+border-radius:8px;
+}
+
+.search-box button{
+padding:10px 20px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+/* Meeting Card */
+.meeting{
+max-width:1100px;
+margin:10px auto;
+background:white;
+padding:15px;
+border-radius:10px;
+cursor:pointer;
+box-shadow:0 4px 12px rgba(0,0,0,0.08);
+transition:0.3s;
+}
+
+.meeting:hover{
+background:#eef2ff;
+}
+
+.details{
+display:none;
+margin-top:10px;
+padding:15px;
+background:#f9fafb;
+border-radius:8px;
+}
+
+.details h3{
+color:#2563eb;
+margin-top:10px;
+}
+
+.details ul{
+padding-left:20px;
+}
+
+.details li{
+margin-bottom:5px;
+}
+
+.actions{
+margin-top:10px;
+}
+
+.actions a{
+text-decoration:none;
+background:#2563eb;
+color:white;
+padding:6px 10px;
+border-radius:6px;
+font-size:14px;
+}
+</style>
+
+<script>
+function toggleDetails(id){
+    let el = document.getElementById("details-" + id);
+
+    if(el.style.display === "block"){
+        el.style.display = "none";
+    } else {
+        el.style.display = "block";
+    }
+}
+</script>
+
+</head>
+
+<body>
+
+<h1>Meeting History</h1>
+
+<div class="topnav">
+<a href="/">🏠 Home</a>
+<a href="/logout">🚪 Logout</a>
+</div>
+
+<form class="search-box" method="GET">
+<input type="text" name="q" placeholder="Search meetings..." value="{{ request.args.get('q','') }}">
+<button type="submit">Search</button>
+</form>
+
+{% for row in rows %}
+
+<div class="meeting" onclick="toggleDetails('{{ row[0] }}')">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+    <b>Meeting {{ row[0] }}</b>
+    <small style="color:#666;">
+        🕒 {{ row[6] }}
+    </small>
+</div> 
+    <br>
+    <small>{{ row[3][:80] }}...</small>
+
+    <div id="details-{{ row[0] }}" class="details">
+
+        <h3>Summary</h3>
+        <p>{{ row[3] }}</p>
+
+        <h3>Key Points</h3>
+        <ul>
+        {% for kp in row[4] | from_json %}
+        <li>{{ kp }}</li>
+        {% endfor %}
+        </ul>
+
+        <h3>Action Items</h3>
+        <ul>
+        {% for ai in row[5] | from_json %}
+        <li>{{ ai }}</li>
+        {% endfor %}
+        </ul>
+
+        <div class="actions">
+    <a href="/download/{{ row[0] }}">📄 Download PDF</a>
+
+    <a href="/delete/{{ row[0] }}"
+       style="background:#ef4444; margin-left:10px;"
+       onclick="return confirm('Delete this meeting?')">
+       🗑 Delete
+    </a>
+</div>
+
+    </div>
+</div>
+
+{% endfor %}
+
+</body>
+</html>
